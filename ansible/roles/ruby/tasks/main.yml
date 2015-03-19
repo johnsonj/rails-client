@@ -1,0 +1,6 @@
+---
+- include: package.yml
+  when: ruby_install == 'package'
+
+- include: rvm.yml
+  when: ruby_install == 'rvm'

@@ -1,0 +1,64 @@
+---
+app_name: railsclient
+rails_env: development
+
+databases:
+  - postgresql
+background_jobs:
+packages:
+  - curl
+  - libcurl3
+  - libcurl3-gnutls
+  - libcurl4-openssl-dev
+  - imagemagick
+  - libmagickwand-dev
+  - libxslt-dev
+  - libxml2-dev
+  - vim
+  - libgtkmm*
+  - libnotify4
+manual_ruby_version: 
+vm_os: ubuntu/trusty64
+package_bundles:
+  - curl
+  - graphics
+  - qt
+autoconf: true
+vm_memory: 4096
+vm_swap: 2048
+vm_cores: 2
+vm_shared_directory: /vagrant
+vm_share_type: SMB
+vm_shared_directory: /vagrant
+vm_name: railsclient
+environment_file: /vagrant/.envrc
+ruby_install: rvm
+ruby_version: 2.1.0
+server_name: localhost
+server_type: nginx_unicorn
+postgresql_orm: none
+postgresql_version: 9.1
+postgresql_db_name: railsclient_dev
+postgresql_db_user: pguser
+postgresql_db_password: pguser
+postgresql_extensions:
+  - hstore
+rails_version: 3.2
+
+user_name: vagrant
+group_name: vagrant
+
+ssl_certificate_path: /etc/nginx/ssl/localhost.crt
+ssl_certificate_key_path: /etc/nginx/ssl/localhost.key
+
+app_path: /rails/dev
+app_public_path: "{{ app_path }}/public"
+app_config_path: "/home/vagrant/config"
+app_temp_path: "/tmp"
+app_logs_path: "{{ app_path }}/log"
+
+unicorn_sock_path: "/tmp/unicorn.{{ rails_env }}.sock"
+unicorn_config_path: "{{ app_config_path }}/unicorn.{{ rails_env }}.rb"
+unicorn_pid_path: "{{ app_temp_path }}/unicorn.{{ rails_env }}.pid"
+unicorn_stderr_path: "{{ app_logs_path }}/unicorn.err.log"
+unicorn_stdout_path: "{{ app_logs_path }}/unicorn.log"

@@ -1,0 +1,23 @@
+- name: setup db
+  command: /bin/bash -l -c 'rake db:setup' chdir={{ app_path }}
+  sudo: no
+
+- name: load structure
+  command: /bin/bash -l -c 'rake db:structure:load' chdir={{ app_path }}
+  sudo: no
+
+- name: seed database
+  command: /bin/bash -l -c 'rake db:seed' chdir={{ app_path }}
+  sudo: no
+
+- name: migrate database
+  command: /bin/bash -l -c 'rake db:migrate' chdir={{ app_path }}
+  sudo: no
+
+- name: setup test db
+  command: /bin/bash -l -c 'rake db:test:prepare' chdir={{ app_path }}
+  sudo: no
+
+- name: run the test suite for the first time
+  command: /bin/bash -l -c 'bundle exec rspec' chdir={{ app_path }}
+  sudo: no

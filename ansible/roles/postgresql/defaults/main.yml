@@ -1,0 +1,6 @@
+---
+postgresql_version: 0.0
+postgresql_ext_postgis_version: 2.1
+postgresql_extensions: []
+postgresql_admin_user: postgres
+postgresql_repo: deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main

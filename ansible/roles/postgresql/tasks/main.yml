@@ -1,0 +1,63 @@
+---
+# Needed for add-apt-repository
+- name: Install python-software-properties
+  apt: pkg=python-software-properties state=installed update-cache=yes
+  tags:
+    - apt
+
+- name: Add repository key
+  apt_key: url="https://www.postgresql.org/media/keys/ACCC4CF8.asc" state=present
+  tags:
+    - apt
+
+- name: Add PostgreSQL repository
+  apt_repository: repo="{{ postgresql_repo }}" state=present
+  tags:
+    - apt
+
+- name: Install packages
+  apt: name={{ item }} state=present
+  with_items:
+    - libpq-dev
+    - 'postgresql-{{ postgresql_version }}'
+    - 'postgresql-contrib-{{ postgresql_version }}'
+
+- name: Install required Python modules
+  pip: name=psycopg2
+
+- name: Create postgresql user
+  postgresql_user: name={{ postgresql_db_user }} password={{ postgresql_db_password }} role_attr_flags=CREATEDB,SUPERUSER
+  sudo_user: postgres
+
+- name: Create postgresql database
+  postgresql_db: name={{ postgresql_db_name }} owner={{ postgresql_db_user }}
+  sudo_user: postgres
+
+- name: Create config/database.yml
+  template: src=database.yml.j2 dest={{ app_config_path }}/database.yml owner={{ user_name }} mode=0600 backup=yes
+  when: postgresql_orm in ['activerecord', 'sequel', 'datamapper']
+
+- name: Create sysctl
+  template: src=sysctl.conf.j2 dest=/etc/sysctl.conf owner={{ user_name }} mode=0555 backup=yes
+  sudo_user: root
+
+- name: Reload sysctl
+  sudo_user: root
+  command: /bin/bash -l -c 'sysctl -p /etc/sysctl.conf'
+
+- name: Create postgresql.conf
+  template: src=postgresql.conf.j2 dest='/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf' owner=root mode=0555 backup=yes
+  sudo_user: root
+
+- name: Make sure the postgis extensions are installed
+  apt: name={{ item }}
+  with_items:
+    - libgeos-c1
+    - 'postgresql-{{ postgresql_version }}-postgis-{{ postgresql_ext_postgis_version }}'
+  notify: restart postgresql
+  when: "'postgis' in postgresql_extensions"
+
+- name: Create extensions
+  sudo_user: '{{ postgresql_admin_user }}'
+  shell: "psql {{ postgresql_db_name }} -c 'CREATE EXTENSION IF NOT EXISTS {{ item }};'"
+  with_items: postgresql_extensions

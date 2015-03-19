@@ -1,0 +1,5 @@
+.vagrant
+mkmf.log
+private_files/*
+dev/*
+prod/*

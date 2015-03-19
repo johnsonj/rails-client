@@ -1,0 +1,8 @@
+# For Postgres, 16GB SHMMAX
+kernel.shmmax=17179869184
+kernel.shmall=4194304
+
+# Disable IPv6. It messes up our Facebook API requests and such.
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1

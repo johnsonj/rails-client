@@ -1,0 +1,37 @@
+---
+- name: Update apt cache
+  apt: update_cache=yes
+
+- name: Install apt dependencies
+  apt: name={{ item }}
+  with_items:
+    - autoconf
+    - bison
+    - build-essential
+    - libssl-dev
+    - libyaml-dev
+    - libreadline6-dev
+    - zlib1g-dev
+    - libncurses5-dev
+    - nodejs
+    - python-pip
+    - python-dev
+    - htop
+    - git
+
+- name: Install additional packages
+  apt: name={{ item }}
+  with_items: packages
+
+- name: Setup script to read application environment
+  template: src=read_environment.sh.j2 dest=/etc/profile.d/read_environment.sh
+  notify:
+    - restart application
+
+- name: Create directories
+  file: path={{ item }} state=directory
+  with_items:
+    - '{{ app_config_path }}'
+    - '{{ app_public_path }}'
+    - '{{ app_temp_path }}'
+    - '{{ app_logs_path }}'
