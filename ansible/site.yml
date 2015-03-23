@@ -4,5 +4,4 @@
     - base
     - swap
     - postgresql
-    - webserver
     - dbserver

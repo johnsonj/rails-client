@@ -7,7 +7,7 @@
 # | '__/ _` | | / __|_____ / __| | |/ _ \ '_ \| __|
 # | | | (_| | | \__ \_____| (__| | |  __/ | | | |_ 
 # |_|  \__,_|_|_|___/      \___|_|_|\___|_| |_|\__|
-#   vagrant config for windows user who like rails
+#   vagrant config for rails developers on windows
 #
 # To get started, run vagrant up --provider <hyperv|???>
 #
@@ -45,10 +45,18 @@ plugins = {
   'vagrant-hostmanager' => '1.5.0'
 }
 plugins.each do |plugin, version|
+  # If Vagrant is being used in a bundle (local development)
+  # We need to pull in the plugin directly
+  if defined?(Bundler)
+    require "bundler/shared_helpers"
+    require plugin if Bundler::SharedHelpers.in_bundle? && !Vagrant.very_quiet?
+  end
+
   unless Vagrant.has_plugin?(plugin)
     system("vagrant plugin install #{plugin} --plugin-version #{version}") || exit!
     needs_restart = true
   end
+
   exit system('vagrant', *ARGV) if needs_restart
 end
 
@@ -75,8 +83,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # ################################### #
 
   config.vm.provider :hyperv do |vb|
-    # Need to define memory/cpu here.
-    # This can get filled out with the release of Vagrant 1.7.3 
+    # If you're not running 'edge' vagrant these params don't exist
+    vb.memory     = 2 * 1024 if vb.respond_to? :memory=
+    vb.maxmemory  = 4 * 1024 if vb.respond_to? :maxmemory=
+    vb.cpus       = 2        if vb.respond_to? :cpus=
   end
 
   config.vm.provider :virtualbox do |vb|
@@ -100,7 +110,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     machine.vm.hostname = 'railsdev'
     machine.vm.network 'forwarded_port', guest: 80, host: 8080
     machine.vm.network 'forwarded_port', guest: 443, host: 8081
-    machine.hostmanager.aliases = %w(rails.dev)
+    machine.hostmanager.aliases = %w(railsclient.dev)
   end
 
   config.hostmanager.enabled = true
@@ -113,12 +123,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # ################################### #
 
   # Mount dev via rsync for performance. This is a one way sync so it clobbers the dev environment changes. 
-  config.vm.synced_folder '../dev', '/rails/dev', type: 'rsync', rsync__auto: "true", rsync__exclude: ".git/", id: "dev"
+  config.vm.synced_folder '../dev', '/railsclient/dev', type: 'rsync', rsync__auto: "true", rsync__exclude: ".git/", id: "dev"
   # Create a second copy of the dev instance for 'bi-directional' sync. This is for tasks that require output from the server, eg rails generators
-  config.vm.synced_folder '../dev', '/rails/dev_presistent', mount_opts
+  config.vm.synced_folder '../dev', '/railsclient/dev_presistent', mount_opts
   # Ansible needs access to the ansible config
   config.vm.synced_folder 'ansible', '/ansible', mount_opts
-
 
   # ################################### #
   # Provisioning                        #

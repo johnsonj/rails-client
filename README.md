@@ -22,19 +22,19 @@ rails-client is an example vagrant/ansible setup for rapid Ruby on Rails develop
 1. Open a command line as an Administrator
 2. Run `vagrant up && vagrant rsync-auto`
 3. SSH into your machine: vagrant ssh. Default username/password is `vagrant/vagrant`
-4. Access your machine via: `rails.dev` (eg: `http://rails.dev:3000`)
+4. Access your machine via: `railsclient.dev` (eg: `http://railsclientclient.dev:3000`)
 
 ## File Syncing ##
 
-By default, rails-client will rsync `C:\rails\dev` on the host to `/rails/dev` on the guest. This folder will be automatically updated every time a file is changed on the host. **Any changes made on the guest will be overwritten.** 
+By default, rails-client will rsync `..\dev` on the host to `/railsclient/dev` on the guest. This folder will be automatically updated every time a file is changed on the host. **Any changes made on the guest will be overwritten.** 
 
-It will also sync `C:\rails\dev` to `/rails/dev_persistent` via SMB. This folder is a network mount so any changes made on the guest will show up on the host. It has some performance issues so in general I recommend only using that mount when you need to run rails generators and other commands that produce valuable output.
+It will also sync `..\dev` to `/railsclient/dev_persistent` via SMB. This folder is a network mount so any changes made on the guest will show up on the host. It has some performance issues so in general I recommend only using that mount when you need to run rails generators and other commands that produce valuable output.
 
-The `C:\rails\rails-client\ansible` folder will be mounted to `/ansible`
+The `.\ansible` folder will be mounted to `/ansible`
 
 ## Network Access ##
 
-The guest needs to connect to a network with DHCP. This is a limitation I'd like to fix in the near future. For your convenience, a HOSTS entry is created so you can access your guest by connecting to `rails.dev`
+The guest needs to connect to a network with DHCP. This is a limitation I'd like to fix in the near future. For your convenience, a HOSTS entry is created so you can access your guest by connecting to `railsclient.dev`
 
 ## Authentication ##
 
